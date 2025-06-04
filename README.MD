@@ -3,17 +3,12 @@
 ![Java](https://img.shields.io/badge/Java-17-%23ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.0-%236DB33F?logo=springboot&logoColor=white)
 ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-3.5.1-%23231F20?logo=apachekafka&logoColor=white)
-![Kafka Streams](https://img.shields.io/badge/Kafka_Streams-3.5.1-%23000000?logo=apachekafka&logoColor=white)
 ![Debezium](https://img.shields.io/badge/Debezium-2.3-%23BF2BBD?logo=debezium&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13-%23336791?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-20.10%2B-%232496ED?logo=docker&logoColor=white)
+![Kafka Streams](https://img.shields.io/badge/Kafka_Streams-3.5.1-%23000000?logo=apachekafka&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-3.8%2B-%23C71A36?logo=apachemaven&logoColor=white)
-
-![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-3.1.0-%236DB33F?logo=spring&logoColor=white)
-![Lombok](https://img.shields.io/badge/Lombok-1.18.28-%23000000?logo=lombok&logoColor=white)
-![JSON](https://img.shields.io/badge/JSON_Serde-%23231F20?logo=json&logoColor=white)
 ![REST API](https://img.shields.io/badge/REST_API-%23563D7C?logo=rest&logoColor=white)
-![CDC](https://img.shields.io/badge/Change_Data_Capture-%23007ACC?logo=datastax&logoColor=white)
 
 ### Профессиональная система для обнаружения мошеннических транзакций в реальном времени с использованием:
 
@@ -22,6 +17,8 @@
 - PostgreSQL как основного хранилища данных
 - Spring Boot как бэкенд-фреймворка
 
+---
+### Схема работы
 ```mermaid
 graph LR
 A[Transaction Service] -->|REST API| B[PostgreSQL]
@@ -33,12 +30,15 @@ F -->|Mark Suspicious| B
 ```
 
 
-
+---
 
 > ### ⚠️ ВАЖНОЕ ПРИМЕЧАНИЕ ПО БЕЗОПАСНОСТИ
 > **SSL/TLS сертификаты не включены в публичный репозиторий** в целях безопасности.  
 > Для настройки защищенного соединения следуйте инструкциям в разделах:  
 > [Конфигурация безопасности](#конфигурация-безопасности).
+
+---
+
 
 ## Структура проекта
 
@@ -63,7 +63,7 @@ fraud-detection/
 └── README.md                     # Документация
 ```
 
-
+---
 
 ## Технологический стек
 
@@ -102,7 +102,7 @@ end
     K -- Consume Alerts --> FP
     FP -- Update Status --> P
 ```
-
+---
 ## Требования к окружению
 Минимальные системные требования
 
@@ -118,6 +118,7 @@ end
 - Maven 3.8+
 - Git 2.30+
 
+---
 ## Развертывание системы
 1. Клонирование репозитория
 
@@ -151,7 +152,7 @@ curl -X POST http://localhost:8080/transactions \
 ``` 
 
 
-## Добавление настроек SSL для Spring Boot приложение:
+### Добавление настроек SSL для Spring Boot приложение:
 
 ```
 # application.properties
@@ -159,7 +160,7 @@ spring.kafka.properties.security.protocol=SSL
 spring.kafka.ssl.trust-store-location=classpath:ssl/kafka.client.truststore.jks
 spring.kafka.ssl.trust-store-password=changeit
 ```
-
+---
 ## Тестирование системы
 ### 1. Генерация тестовых транзакций
 
@@ -188,13 +189,13 @@ SELECT user_id, status, COUNT(*)
 FROM transaction 
 GROUP BY user_id, status;
 ```
-
+---
 ## Мониторинг и отладка
 ### Доступные интерфейсы:
 - Debezium Connect: http://localhost:8083/connectors
 - PostgreSQL: psql -h localhost -U springuser transactions_db
 
-
+---
 ## Оптимизация производительности
 ### Настройки Kafka Streams
 ```
@@ -214,9 +215,9 @@ kafka:
 ```
 
 
+---
 
-
-# Конфигурация безопасности
+## Конфигурация безопасности
 
 ### 1. Создайте SSL сертификаты в директории docker/ssl (в корне проекта):
 
@@ -287,7 +288,7 @@ docker system prune -a -f
 docker-compose up -d
 ````
 
-
+---
 ## Тестирование работы:
 
  - Отправка тестовых транзакций
@@ -307,7 +308,7 @@ docker-compose logs kafka | grep "Fraud detected"
 ```bash
 docker exec -it postgres psql -U postgres -d transactions_db
 ```
-
+---
 ## Оптимизация производительности
 ### Настройки Kafka Streams
 
@@ -326,6 +327,6 @@ kafka:
     KAFKA_HEAP_OPTS: "-Xmx2G -Xms2G"
     KAFKA_JVM_PERFORMANCE_OPTS: "-XX:MetaspaceSize=96m"
 ```
-
+---
 ## Лицензия
-Данный проект распространяется под лицензией [MIT License](https://choosealicense.com/licenses/mit/).
+@ 2025. Данный проект распространяется под лицензией [MIT License](https://choosealicense.com/licenses/mit/).
