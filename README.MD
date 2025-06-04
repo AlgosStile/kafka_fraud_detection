@@ -18,14 +18,12 @@
 ### Профессиональная система для обнаружения мошеннических транзакций в реальном времени с использованием:
 
 - Kafka Streams для обработки потоковых данных
-
 - Debezium для CDC (Change Data Capture)
-
 - PostgreSQL как основного хранилища данных
-
 - Spring Boot как бэкенд-фреймворка
 
-```graph LR
+```mermaid
+graph LR
 A[Transaction Service] -->|REST API| B[PostgreSQL]
 B -->|CDC| C[Debezium]
 C -->|Kafka Topic| D[Kafka]
@@ -81,7 +79,8 @@ fraud-detection/
 
 ### Архитектура решения
 
-```flowchart TD
+```mermaid
+flowchart TD
 subgraph Infrastructure
 Z[Zookeeper]
 K[Kafka Broker]
