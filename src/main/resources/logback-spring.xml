@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Кастомные настройки логгирования для Kafka -->
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.springframework.kafka" level="DEBUG"/>
+    <logger name="com.fraud.detection" level="DEBUG"/>
+</configuration>
