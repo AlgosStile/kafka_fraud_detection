@@ -68,7 +68,7 @@ fraud-detection/
 ## Технологический стек
 
 - Java 17
-- Spring Boot 3.1.0
+- Spring Boot 3.5.0
 - Apache Kafka 3.5.1
 - Kafka Streams
 - Debezium 2.3
