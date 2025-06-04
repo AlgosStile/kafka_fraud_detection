@@ -5,7 +5,6 @@ services:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
     environment:
-      ZOOKEEPER_SASL_ENABLED: "false"
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
@@ -25,21 +24,23 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
     networks:
       - kafka-network
 
   postgres:
-    platform: linux/amd64
     image: postgres:13
     container_name: postgres
     environment:
       POSTGRES_DB: transactions_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    command: [ "postgres", "-c", "wal_level=logical" ]
+      POSTGRES_USER: springuser
+      POSTGRES_PASSWORD: springpass
+      POSTGRES_HOST_AUTH_METHOD: md5
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+      - "-c"
+      - "password_encryption=md5"
     ports:
       - "5432:5432"
     volumes:
@@ -61,21 +62,10 @@ services:
       CONFIG_STORAGE_TOPIC: connect_configs
       OFFSET_STORAGE_TOPIC: connect_offsets
       STATUS_STORAGE_TOPIC: connect_statuses
-
-      # Безопасность отключена
-      CONNECT_SECURITY_PROTOCOL: PLAINTEXT
-      CONNECT_PRODUCER_SECURITY_PROTOCOL: PLAINTEXT
-      CONNECT_CONSUMER_SECURITY_PROTOCOL: PLAINTEXT
-
-      # Конвертеры
       CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-
-      # Дополнительные настройки
-      CONNECT_REST_ADVERTISED_HOST_NAME: connect
-      CONNECT_PLUGIN_PATH: /kafka/connect
     networks:
       - kafka-network
 
@@ -86,62 +76,64 @@ networks:
   kafka-network:
     driver: bridge
 
-  #  connect:
-  #    image: debezium/connect:2.3
-  #    container_name: connect
-  #    depends_on:
-  #      - kafka
-  #      - postgres
-  #    ports:
-  #      - "8083:8083"
-  #      - "5005:5005"  # Для отладки
-  #    environment:
-  #      # bootstrap-сервер:
-  #      BOOTSTRAP_SERVERS: kafka:29092
-  #      GROUP_ID: 1
-  #      CONFIG_STORAGE_TOPIC: connect_configs
-  #      OFFSET_STORAGE_TOPIC: connect_offsets
-  #      STATUS_STORAGE_TOPIC: connect_statuses
-  #
-  #      # JAAS для Connect:
-  #      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/jaas.config"
-  #
-  #      # SSL настройки для Connect:
-  #      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin-secret\";"
-  #      CONNECT_SASL_MECHANISM: PLAIN
-  #      CONNECT_SECURITY_PROTOCOL: SASL_SSL
-  #      CONNECT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
-  #      CONNECT_SSL_TRUSTSTORE_PASSWORD: changeit
-  #      CONNECT_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
-  #      CONNECT_SSL_KEYSTORE_PASSWORD: changeit
-  #      CONNECT_SSL_KEY_PASSWORD: changeit
-  #
-  #      # SSL для продюсера Connect:
-  #      CONNECT_PRODUCER_SECURITY_PROTOCOL: SSL
-  #      CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
-  #      CONNECT_PRODUCER_SSL_TRUSTSTORE_PASSWORD: changeit
-  #      CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
-  #      CONNECT_PRODUCER_SSL_KEYSTORE_PASSWORD: changeit
-  #      CONNECT_PRODUCER_SSL_KEY_PASSWORD: changeit
-  #
-  #      # SSL для консьюмера Connect:
-  #      CONNECT_CONSUMER_SECURITY_PROTOCOL: SSL
-  #      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
-  #      CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: changeit
-  #      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
-  #      CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD: changeit
-  #      CONNECT_CONSUMER_SSL_KEY_PASSWORD: changeit
-  #
-  #      # Конфигурация конвертеров:
-  #      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-  #      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-  #      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
-  #      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
-  #
-  #      # Дополнительные настройки:
-  #      CONNECT_REST_ADVERTISED_HOST_NAME: connect
-  #      CONNECT_PLUGIN_PATH: /kafka/connect
-  #    volumes:
-  #      - ./ssl:/etc/kafka/secrets
-  #    networks:
-  #      - kafka-network
+
+    # Для настройки через SSL
+    #  connect:
+    #    image: debezium/connect:2.3
+    #    container_name: connect
+    #    depends_on:
+    #      - kafka
+    #      - postgres
+    #    ports:
+    #      - "8083:8083"
+    #      - "5005:5005"  # Для отладки
+    #    environment:
+    #      # bootstrap-сервер:
+    #      BOOTSTRAP_SERVERS: kafka:29092
+    #      GROUP_ID: 1
+    #      CONFIG_STORAGE_TOPIC: connect_configs
+    #      OFFSET_STORAGE_TOPIC: connect_offsets
+    #      STATUS_STORAGE_TOPIC: connect_statuses
+    #
+    #      # JAAS для Connect:
+    #      KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/jaas.config"
+    #
+    #      # SSL настройки для Connect:
+    #      CONNECT_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"admin-secret\";"
+    #      CONNECT_SASL_MECHANISM: PLAIN
+    #      CONNECT_SECURITY_PROTOCOL: SASL_SSL
+    #      CONNECT_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
+    #      CONNECT_SSL_TRUSTSTORE_PASSWORD: changeit
+    #      CONNECT_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
+    #      CONNECT_SSL_KEYSTORE_PASSWORD: changeit
+    #      CONNECT_SSL_KEY_PASSWORD: changeit
+    #
+    #      # SSL для продюсера Connect:
+    #      CONNECT_PRODUCER_SECURITY_PROTOCOL: SSL
+    #      CONNECT_PRODUCER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
+    #      CONNECT_PRODUCER_SSL_TRUSTSTORE_PASSWORD: changeit
+    #      CONNECT_PRODUCER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
+    #      CONNECT_PRODUCER_SSL_KEYSTORE_PASSWORD: changeit
+    #      CONNECT_PRODUCER_SSL_KEY_PASSWORD: changeit
+    #
+    #      # SSL для консьюмера Connect:
+    #      CONNECT_CONSUMER_SECURITY_PROTOCOL: SSL
+    #      CONNECT_CONSUMER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/truststore.jks
+    #      CONNECT_CONSUMER_SSL_TRUSTSTORE_PASSWORD: changeit
+    #      CONNECT_CONSUMER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.jks
+    #      CONNECT_CONSUMER_SSL_KEYSTORE_PASSWORD: changeit
+    #      CONNECT_CONSUMER_SSL_KEY_PASSWORD: changeit
+    #
+    #      # Конфигурация конвертеров:
+    #      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    #      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+    #      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+    #      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+    #
+    #      # Дополнительные настройки:
+    #      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+    #      CONNECT_PLUGIN_PATH: /kafka/connect
+    #    volumes:
+    #      - ./ssl:/etc/kafka/secrets
+    #    networks:
+    #      - kafka-network

@@ -44,3 +44,6 @@ build/
 .docker
 /docer/
 docker/
+.pg_hba.conf
+/pg_hba.conf/
+pg_hba.conf/
