@@ -328,5 +328,5 @@ kafka:
     KAFKA_JVM_PERFORMANCE_OPTS: "-XX:MetaspaceSize=96m"
 ```
 ---
-## Лицензия
-@ 2025. Данный проект распространяется под лицензией [MIT License](https://choosealicense.com/licenses/mit/).
+## 📜 Лицензия
+© 2025. Данный проект распространяется под лицензией [MIT License](https://choosealicense.com/licenses/mit/).
